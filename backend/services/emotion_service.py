@@ -18,6 +18,12 @@ try:
     from deepface import DeepFace
     DEEPFACE_AVAILABLE = True
     logger.info("✅ DeepFace loaded successfully")
+
+    # Pre-load model at startup — not on first request
+    logger.info("⏳ Pre-loading Facenet model into memory...")
+    DeepFace.build_model("Facenet")
+    logger.info("✅ Facenet model ready")
+
 except ImportError:
     DEEPFACE_AVAILABLE = False
     logger.warning("⚠️  DeepFace not available — using mock emotion data for demo")
@@ -148,7 +154,8 @@ class EmotionDetector:
                 img_path=frame,
                 actions=['emotion'],
                 enforce_detection=False,
-                silent=True
+                silent=True,
+                detector_backend="opencv"   # lightweight — saves ~95MB vs retinaface
             )
 
             # Handle list or dict result
